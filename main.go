@@ -1,60 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"net"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/a-h/templ"
-	"github.com/dustin/go-humanize"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/shirou/gopsutil/v4/cpu"
-	"github.com/shirou/gopsutil/v4/disk"
-	"github.com/shirou/gopsutil/v4/host"
-	"github.com/shirou/gopsutil/v4/load"
-	"github.com/shirou/gopsutil/v4/mem"
-	"github.com/shirou/gopsutil/v4/process"
-	"github.com/shirou/gopsutil/v4/sensors"
+	"github.com/tranchida/echotest/internal/handlers"
 )
-
-type HostInfo struct {
-	CurrentTime       string
-	Hostname          string
-	Uptime            string
-	OS                string
-	Platform          string
-	PlatformVersion   string
-	CPUP              int
-	CPUV              int
-	TotalMemory       string
-	CacheMemory       string
-	FreeMemory        string
-	TotalDiskSpace    string
-	FreeDiskSpace     string
-	CPUTemperature    string
-	CPUUsage          string
-	LoadAverage       string
-	TotalSwap         string
-	FreeSwap          string
-	NetworkInterfaces []string
-	RunningProcesses  int
-	KernelVersion     string
-	BootTime          string
-}
-
-func Render(ctx echo.Context, statusCode int, t templ.Component) error {
-	buf := templ.GetBuffer()
-	defer templ.ReleaseBuffer(buf)
-
-	if err := t.Render(ctx.Request().Context(), buf); err != nil {
-		return err
-	}
-
-	return ctx.HTML(statusCode, buf.String())
-}
 
 func newEcho() (*echo.Echo, error) {
 
@@ -68,90 +18,9 @@ func newEcho() (*echo.Echo, error) {
 		CustomTimeFormat: "02/Jan/2006:15:04:05 -0700",
 	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return Render(c, http.StatusOK, index())
-	})
+	e.GET("/", handlers.IndexHandler)
 
-	e.GET("/host", func(c echo.Context) error {
-		hostname, _ := os.Hostname()
-
-		// extract information from the current host using gopsutil
-		uptime, _ := host.Uptime()
-		info, _ := host.Info()
-		cpuCountP, _ := cpu.Counts(false)
-		cpuCountV, _ := cpu.Counts(true)
-		memory, _ := mem.VirtualMemory()
-		disk, _ := disk.Usage("/")
-
-		// Get CPU temperature
-		temps, err := sensors.SensorsTemperatures()
-		cpuTemp := "N/A"
-		if err == nil && len(temps) > 0 {
-			// Find the first CPU temperature sensor
-			for _, temp := range temps {
-				if temp.SensorKey == "coretemp_core_0" {
-					cpuTemp = fmt.Sprintf("%.0f°C", temp.Temperature)
-					break
-				}
-			}
-		}
-
-		// Get CPU usage
-		cpuPercent, _ := cpu.Percent(0, false)
-		cpuUsage := fmt.Sprintf("%.2f%%", cpuPercent[0])
-
-		// Get load average
-		loadAvg, _ := load.Avg()
-		loadAverage := fmt.Sprintf("%.2f, %.2f, %.2f", loadAvg.Load1, loadAvg.Load5, loadAvg.Load15)
-
-		// Get swap memory
-		swap, _ := mem.SwapMemory()
-
-		// Get network interfaces
-		netInterfaces, _ := net.Interfaces()
-		var interfaces []string
-		for _, iface := range netInterfaces {
-			interfaces = append(interfaces, iface.Name)
-		}
-
-		// Get number of running processes
-		processes, _ := process.Pids()
-
-		// Get kernel version
-		kernelVersion := info.KernelVersion
-
-		// Get boot time
-		bootTime := time.Unix(int64(info.BootTime), 0).Format(time.RFC3339)
-
-		
-		hostInfo := HostInfo{
-			CurrentTime:       time.Now().Format(time.RFC3339),
-			Hostname:          hostname,
-			Uptime:            formatDuration(time.Duration(uptime) * time.Second),
-			OS:                info.OS,
-			Platform:          info.Platform,
-			PlatformVersion:   info.PlatformVersion,
-			CPUP:              cpuCountP,
-			CPUV:              cpuCountV,
-			TotalMemory:       humanize.IBytes(memory.Total),
-			FreeMemory:        humanize.IBytes(memory.Free),
-			CacheMemory:       humanize.IBytes(memory.Cached),
-			TotalDiskSpace:    humanize.IBytes(disk.Total),
-			FreeDiskSpace:     humanize.IBytes(disk.Free),
-			CPUTemperature:    cpuTemp,
-			CPUUsage:          cpuUsage,
-			LoadAverage:       loadAverage,
-			TotalSwap:         humanize.IBytes(swap.Total),
-			FreeSwap:          humanize.IBytes(swap.Free),
-			NetworkInterfaces: interfaces,
-			RunningProcesses:  len(processes),
-			KernelVersion:     kernelVersion,
-			BootTime:          bootTime,
-		}
-		
-		return Render(c, http.StatusOK, hostDisplay(hostInfo))
-
-	})
+	e.GET("/host", handlers.HostHandler)
 
 	return e, nil
 }
@@ -167,14 +36,4 @@ func main() {
 		panic(err)
 	}
 
-}
-
-func formatDuration(d time.Duration) string {
-	days := d / (24 * time.Hour)
-	d -= days * 24 * time.Hour
-	hours := d / time.Hour
-	d -= hours * time.Hour
-	minutes := d / time.Minute
-
-	return fmt.Sprintf("%d jours, %d heures, %d minutes", days, hours, minutes)
 }

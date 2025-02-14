@@ -1,8 +1,11 @@
-package main
+package components
 
-import "strconv"
+import (
+	"strconv"
+	"github.com/tranchida/echotest/internal/models"
+)
 
-templ hostDisplay(hostinfo HostInfo) {
+templ HostDisplay(hostinfo models.HostInfo) {
 	<section class="section">
 		<nav class="panel">
 			<table class="table is-fullwidth is-hoverable">
