@@ -1,7 +1,6 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 	"net"
 	"net/http"
@@ -46,9 +45,6 @@ type HostInfo struct {
 	BootTime          string
 }
 
-//go:embed static
-var contentFS embed.FS
-
 func Render(ctx echo.Context, statusCode int, t templ.Component) error {
 	buf := templ.GetBuffer()
 	defer templ.ReleaseBuffer(buf)
@@ -63,7 +59,7 @@ func Render(ctx echo.Context, statusCode int, t templ.Component) error {
 func newEcho() (*echo.Echo, error) {
 
 	e := echo.New()
-	e.HideBanner = true
+	e.HideBanner = false
 
 	e.Use(middleware.Gzip())
 
@@ -72,10 +68,9 @@ func newEcho() (*echo.Echo, error) {
 		CustomTimeFormat: "02/Jan/2006:15:04:05 -0700",
 	}))
 
-	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:       "static",
-		Filesystem: http.FS(contentFS),
-	}))
+	e.GET("/", func(c echo.Context) error {
+		return Render(c, http.StatusOK, index())
+	})
 
 	e.GET("/host", func(c echo.Context) error {
 		hostname, _ := os.Hostname()
@@ -128,6 +123,7 @@ func newEcho() (*echo.Echo, error) {
 		// Get boot time
 		bootTime := time.Unix(int64(info.BootTime), 0).Format(time.RFC3339)
 
+		
 		hostInfo := HostInfo{
 			CurrentTime:       time.Now().Format(time.RFC3339),
 			Hostname:          hostname,
@@ -152,7 +148,7 @@ func newEcho() (*echo.Echo, error) {
 			KernelVersion:     kernelVersion,
 			BootTime:          bootTime,
 		}
-
+		
 		return Render(c, http.StatusOK, hostDisplay(hostInfo))
 
 	})
