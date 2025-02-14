@@ -3,13 +3,12 @@ package main
 import (
 	"embed"
 	"fmt"
-	"html/template"
-	"io"
 	"net"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/dustin/go-humanize"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -47,42 +46,24 @@ type HostInfo struct {
 	BootTime          string
 }
 
-//go:embed static templates
+//go:embed static
 var contentFS embed.FS
 
-type Template struct {
-	templates *template.Template
-}
+func Render(ctx echo.Context, statusCode int, t templ.Component) error {
+	buf := templ.GetBuffer()
+	defer templ.ReleaseBuffer(buf)
 
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	if err := t.Render(ctx.Request().Context(), buf); err != nil {
+		return err
+	}
+
+	return ctx.HTML(statusCode, buf.String())
 }
 
 func newEcho() (*echo.Echo, error) {
 
 	e := echo.New()
-	e.HideBanner = false
-
-	e.Renderer = &Template{
-		templates: template.Must(template.ParseFS(contentFS, "templates/*")),
-	}
-
-	/*
-		e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-			LogURI:    true,
-			LogStatus: true,
-			LogMethod: true,
-			LogProtocol: true,
-			LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-				if (v.Status >= 200 && v.Status < 300) {
-					logger.Info().Msg(fmt.Sprintf("%s %s %s %d", v.Method, v.URI, v.Protocol, v.Status))
-				} else {
-					logger.Error().Msg(fmt.Sprintf("%s %s %s %d", v.Method, v.URI, v.Protocol, v.Status))
-				}
-				return nil
-			},
-		}))
-	*/
+	e.HideBanner = true
 
 	e.Use(middleware.Gzip())
 
@@ -172,7 +153,7 @@ func newEcho() (*echo.Echo, error) {
 			BootTime:          bootTime,
 		}
 
-		return c.Render(http.StatusOK, "main", hostInfo)
+		return Render(c, http.StatusOK, hostDisplay(hostInfo))
 
 	})
 

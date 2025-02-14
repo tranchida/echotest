@@ -6,6 +6,6 @@
 
 tasks:
   - init: go get && go build ./... && go test ./...
-    command: go tool air
+    command: go templ generate --watch --proxy="http://localhost:8080" --cmd="go run ."
 
 

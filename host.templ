@@ -1,0 +1,77 @@
+package main
+
+import "strconv"
+
+templ hostDisplay(hostinfo HostInfo) {
+	<section class="section">
+		<nav class="panel">
+			<table class="table is-fullwidth is-hoverable">
+				<p class="panel-heading">Host Information</p>
+				<thead>
+					<tr>
+						<th>Property</th>
+						<th>Value</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Hostname</td>
+						<td>{ hostinfo.Hostname }</td>
+					</tr>
+					<tr>
+						<td>OS</td>
+						<td>{ hostinfo.OS }</td>
+					</tr>
+					<tr>
+						<td>Platform</td>
+						<td>{ hostinfo.Platform }</td>
+					</tr>
+					<tr>
+						<td>Platform Version</td>
+						<td>{ hostinfo.PlatformVersion }</td>
+					</tr>
+					<tr>
+						<td>Kernel Version</td>
+						<td>{ hostinfo.KernelVersion }</td>
+					</tr>
+					<tr>
+						<td>Boot Time</td>
+						<td>{ hostinfo.BootTime }</td>
+					</tr>
+					<tr>
+						<td>Uptime</td>
+						<td>{ hostinfo.Uptime }</td>
+					</tr>
+					<tr>
+						<td>CPU Physical / Virtual</td>
+						<td>{ strconv.Itoa(hostinfo.CPUP) } / { strconv.Itoa(hostinfo.CPUV) }</td>
+					</tr>
+					<tr>
+						<td>CPU Usage / Temperature</td>
+						<td>{ hostinfo.CPUUsage } / { hostinfo.CPUTemperature }</td>
+					</tr>
+					<tr>
+						<td>Running Processes count</td>
+						<td>{ strconv.Itoa(hostinfo.RunningProcesses) }</td>
+					</tr>
+					<tr>
+						<td>Load Average</td>
+						<td>{ hostinfo.LoadAverage }</td>
+					</tr>
+					<tr>
+						<td>Total / Free / Cache Memory</td>
+						<td>{ hostinfo.TotalMemory } / { hostinfo.FreeMemory } / { hostinfo.CacheMemory }</td>
+					</tr>
+					<tr>
+						<td>Total / Free Disk Space</td>
+						<td>{ hostinfo.TotalDiskSpace } / { hostinfo.FreeDiskSpace }</td>
+					</tr>
+					<tr>
+						<td>Total Swap / Free</td>
+						<td>{ hostinfo.TotalSwap } / { hostinfo.FreeSwap }</td>
+					</tr>
+				</tbody>
+			</table>
+		</nav>
+	</section>
+}

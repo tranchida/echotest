@@ -1,0 +1,21 @@
+<section class=\"section\"><nav class=\"panel\"><table class=\"table is-fullwidth is-hoverable\"><p class=\"panel-heading\">Host Information</p><thead><tr><th>Property</th><th>Value</th></tr></thead> <tbody><tr><td>Hostname</td><td>
+</td></tr><tr><td>OS</td><td>
+</td></tr><tr><td>Platform</td><td>
+</td></tr><tr><td>Platform Version</td><td>
+</td></tr><tr><td>Kernel Version</td><td>
+</td></tr><tr><td>Boot Time</td><td>
+</td></tr><tr><td>Uptime</td><td>
+</td></tr><tr><td>CPU Physical / Virtual</td><td>
+ / 
+</td></tr><tr><td>CPU Usage / Temperature</td><td>
+ / 
+</td></tr><tr><td>Running Processes count</td><td>
+</td></tr><tr><td>Load Average</td><td>
+</td></tr><tr><td>Total / Free / Cache Memory</td><td>
+ / 
+ / 
+</td></tr><tr><td>Total / Free Disk Space</td><td>
+ / 
+</td></tr><tr><td>Total Swap / Free</td><td>
+ / 
+</td></tr></tbody></table></nav></section>
