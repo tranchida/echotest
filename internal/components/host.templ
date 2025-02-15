@@ -1,21 +1,18 @@
 package components
 
 import (
-	"strconv"
 	"github.com/tranchida/echotest/internal/models"
+	"strconv"
 )
 
 templ HostDisplay(hostinfo models.HostInfo) {
-	<section class="section">
-		<nav class="panel">
-			<table class="table is-fullwidth is-hoverable">
-				<p class="panel-heading">Host Information</p>
-				<thead>
-					<tr>
-						<th>Property</th>
-						<th>Value</th>
-					</tr>
-				</thead>
+	<br/>
+	<div class="card">
+		<div class="card-header">
+			Host Information
+		</div>
+		<div class="card-body">
+			<table class="table table-hover">
 				<tbody>
 					<tr>
 						<td>Hostname</td>
@@ -75,6 +72,6 @@ templ HostDisplay(hostinfo models.HostInfo) {
 					</tr>
 				</tbody>
 			</table>
-		</nav>
-	</section>
+		</div>
+	</div>
 }
