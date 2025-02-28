@@ -1,17 +1,14 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/a-h/templ"
-	"github.com/labstack/echo/v4"
 )
 
-func Render(ctx echo.Context, statusCode int, t templ.Component) error {
-	buf := templ.GetBuffer()
-	defer templ.ReleaseBuffer(buf)
+func Render(w http.ResponseWriter, r *http.Request, statusCode int, t templ.Component) error {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(statusCode)
 
-	if err := t.Render(ctx.Request().Context(), buf); err != nil {
-		return err
-	}
-
-	return ctx.HTML(statusCode, buf.String())
+	return t.Render(r.Context(), w)
 }

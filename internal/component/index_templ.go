@@ -29,7 +29,7 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Host Information</title><link rel=\"stylesheet\" href=\"/styles.css\"><script src=\"/htmx.min.js\"></script></head><body class=\"font-sans bg-gray-900 p-4\"><div class=\"bg-sky-600 p-4 rounded-md\" hx-get=\"/host\" hx-trigger=\"load\"><!-- div hx-get=\"/host\" hx-trigger=\"load, every 10s\">\n        </div --></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Host Information</title><link rel=\"stylesheet\" href=\"/static/styles.css\"><script src=\"/static/htmx.min.js\"></script></head><body class=\"font-sans bg-gray-900 p-4\"><div class=\"bg-sky-600 p-4 rounded-md\" hx-get=\"/host\" hx-trigger=\"load\"><!-- div hx-get=\"/host\" hx-trigger=\"load, every 10s\">\n        </div --></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
