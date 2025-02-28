@@ -9,12 +9,12 @@ import (
 )
 
 func TestHostEndpoint(t *testing.T) {
-	e := newEcho()
+	handler := loggingMiddleware(setupServer())
 
 	req := httptest.NewRequest(http.MethodGet, "/host", nil)
 	rec := httptest.NewRecorder()
 
-	e.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("Expected status %d but got %d", http.StatusOK, rec.Code)
@@ -32,13 +32,12 @@ func TestHostEndpoint(t *testing.T) {
 }
 
 func TestStaticFileNotFound(t *testing.T) {
-	e := newEcho()
+	handler := loggingMiddleware(setupServer())
 
-	// Try to access a non-existent static file
 	req := httptest.NewRequest(http.MethodGet, "/nonexistentfile.txt", nil)
 	rec := httptest.NewRecorder()
 
-	e.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusNotFound {
 		t.Errorf("Expected status %d but got %d", http.StatusNotFound, rec.Code)
