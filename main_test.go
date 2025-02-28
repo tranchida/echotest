@@ -6,10 +6,12 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/tranchida/echotest/internal/middleware"
 )
 
 func TestHostEndpoint(t *testing.T) {
-	handler := loggingMiddleware(setupServer())
+	handler := middleware.LoggingMiddleware(setupServer())
 
 	req := httptest.NewRequest(http.MethodGet, "/host", nil)
 	rec := httptest.NewRecorder()
@@ -32,7 +34,7 @@ func TestHostEndpoint(t *testing.T) {
 }
 
 func TestStaticFileNotFound(t *testing.T) {
-	handler := loggingMiddleware(setupServer())
+	handler := middleware.LoggingMiddleware(setupServer())
 
 	req := httptest.NewRequest(http.MethodGet, "/nonexistentfile.txt", nil)
 	rec := httptest.NewRecorder()

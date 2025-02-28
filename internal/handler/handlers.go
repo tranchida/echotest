@@ -21,3 +21,12 @@ func HostInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	Render(w, r, http.StatusOK, component.HostDisplay(hostInfo))
 }
+
+func HostInfoJsonHandler(w http.ResponseWriter, r *http.Request) {
+	hostInfo, err := model.GetHostInfo()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	RenderJson(w, r, http.StatusOK, hostInfo)
+}
