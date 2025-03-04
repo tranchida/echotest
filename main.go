@@ -1,43 +1,32 @@
 package main
 
 import (
-	"embed"
 	"fmt"
+	"html/template"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/tranchida/echotest/internal/handler"
 )
 
-//go:embed static
-var contentFS embed.FS
+//go: embed static templates
+//var contentFS embed.FS
 
-func newEcho() *echo.Echo {
+func newServer() *http.ServeMux {
 
-	e := echo.New()
+	tmpl := template.Must(template.ParseGlob("templates/*.html"))
 
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format:           "${remote_ip} - - [${time_custom}] \"${method} ${uri} ${protocol}\" ${status} ${bytes_in} ${bytes_out} ${latency_human}\n",
-		CustomTimeFormat: "02/Jan/2006:15:04:05 -0700",
-	}))
+	http.HandleFunc("GET /", handler.IndexHandler(tmpl))
+	http.HandleFunc("GET /host", handler.HostInfoHandler(tmpl))
+	http.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:       "static",
-		Filesystem: http.FS(contentFS),
-	}))
-
-	e.GET("/", handler.IndexHandler)
-	e.GET("/host", handler.HostInfoHandler)
-
-	return e
+	return http.DefaultServeMux
 }
 
 func main() {
 
 	fmt.Println("open browser on : http://localhost:8080")
 
-	if err := newEcho().Start(":8080"); err != nil {
+	if err := http.ListenAndServe(":8080", newServer()); err != nil {
 		panic(err)
 	}
 

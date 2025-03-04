@@ -1,23 +1,34 @@
 package handler
 
 import (
+	"html/template"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
-	"github.com/tranchida/echotest/internal/component"
 	"github.com/tranchida/echotest/internal/model" // Updated import path
 )
 
 // IndexHandler handles the / route.
-func IndexHandler(c echo.Context) error {
-	return Render(c, http.StatusOK, component.Index())
+func IndexHandler(template *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if template.ExecuteTemplate(w, "index.html", nil) != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
 }
 
 // HostInfoHandler handles the /host route.
-func HostInfoHandler(c echo.Context) error {
-	hostInfo, err := model.GetHostInfo()
-	if err != nil {
-		return err // Proper error handling; return the error to Echo
+func HostInfoHandler(template *template.Template) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		hostInfo, err := model.GetHostInfo()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if template.ExecuteTemplate(w, "host.html", hostInfo) != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 	}
-	return Render(c, http.StatusOK, component.HostDisplay(hostInfo))
 }
